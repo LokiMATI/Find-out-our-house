@@ -1,4 +1,5 @@
 using FindOutOurHouse.DAL.Coordinates;
+using FindOutOurHouse.DAL.Images;
 
 namespace FindOutOurHouse.API.DTO.Places;
 
@@ -14,5 +15,5 @@ public record PlaceDto(
     Guid Id,
     string Title,
     string? Description,
-    List<Guid> Images,
+    IEnumerable<Image> Images,
     Coordinate Coordinate);

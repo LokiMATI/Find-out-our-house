@@ -12,28 +12,35 @@ public interface IPlaceRepository
     /// Получить место.
     /// </summary>
     /// <param name="id">Идентификатор.</param>
+    /// <param name="includeTypes">Включённые типы.</param>
     /// <returns>Место.</returns>
-    public Task<Place?> GetAsync(Guid id);
-    
+    public Task<Place?> GetAsync(
+        Guid id,
+        PlaceQueryIncludeTypes includeTypes = PlaceQueryIncludeTypes.None);
+
     /// <summary>
     /// Получить список мест.
     /// </summary>
     /// <param name="title">Название.</param>
     /// <param name="description">Описание.</param>
+    /// <param name="includeTypes">Включённые типы.</param>
     /// <returns>Список мест.</returns>
     public Task<IEnumerable<Place>> GetListAsync(
         string? title = null,
-        string? description = null);
+        string? description = null,
+        PlaceQueryIncludeTypes includeTypes = PlaceQueryIncludeTypes.None);
 
     /// <summary>
     /// Получить список мест в пределах окружности.
     /// </summary>
     /// <param name="center">Центр окружности.</param>
     /// <param name="radius">Радиус.</param>
+    /// <param name="includeTypes">Включённые типы.</param>
     /// <returns>Список мест в пределах окружности.</returns>
     public Task<IEnumerable<Place>> GetListWithinRadiusAsync(
         Coordinate center,
-        double radius);
+        double radius,
+        PlaceQueryIncludeTypes includeTypes = PlaceQueryIncludeTypes.None);
 
     /// <summary>
     /// Создать новое место.

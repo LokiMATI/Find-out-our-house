@@ -9,15 +9,20 @@ public class PlaceRepository(EfDbContext context) : IPlaceRepository
 {
     /// <inheritdoc/>
     public async Task<Place?> GetAsync(
-        Guid id)
-        => await Task.Run(() => context.Places.AsNoTracking().FirstOrDefault(pl => pl.Id == id));
+        Guid id,
+        PlaceQueryIncludeTypes includeTypes = PlaceQueryIncludeTypes.None)
+    {
+        var query = await GetQueryAsync(includeTypes);
+        return query.FirstOrDefault(x => x.Id == id);
+    }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<Place>> GetListAsync(
         string? title = null,
-        string? description = null)
+        string? description = null,
+        PlaceQueryIncludeTypes includeTypes = PlaceQueryIncludeTypes.None)
     {
-        var query = await Task.Run(() => context.Places.AsNoTracking().AsEnumerable());
+        var query = await GetQueryAsync(includeTypes);
         
         if (title is not null)
             query = query.Where(p
@@ -33,11 +38,17 @@ public class PlaceRepository(EfDbContext context) : IPlaceRepository
     /// <inheritdoc/>
     public async Task<IEnumerable<Place>> GetListWithinRadiusAsync(
         Coordinate center,
-        double radius) 
-        => await Task.Run(() => context.Places.AsNoTracking()
-                .Where(p 
-                    => Math.Pow(p.Longitude - center.Longitude, 2) 
-                    * Math.Pow(p.Latitude - center.Latitude, 2) <= Math.Pow(radius, 2)));
+        double radius,
+        PlaceQueryIncludeTypes includeTypes = PlaceQueryIncludeTypes.None)
+    {
+        var query= await GetQueryAsync(includeTypes);
+        
+         query = await Task.Run(() => query.Where(p
+                => Math.Pow(p.Longitude - center.Longitude, 2)
+                * Math.Pow(p.Latitude - center.Latitude, 2) <= Math.Pow(radius, 2)));
+        
+        return query;
+    }
 
     /// <inheritdoc/>
     public async Task<Place> CreateAsync(
@@ -100,4 +111,14 @@ public class PlaceRepository(EfDbContext context) : IPlaceRepository
         await Task.Run(() => context.Places.Remove(place));
         await context.SaveChangesAsync();
     }
+    
+    private async Task<IEnumerable<Place>> GetQueryAsync(PlaceQueryIncludeTypes includeTypes)
+     {
+         IEnumerable<Place> query;
+         if (includeTypes.HasFlag(PlaceQueryIncludeTypes.Images))
+             query = await Task.Run(() => context.Places.AsNoTracking().Include(p => p.Images).AsEnumerable());
+         else 
+             query = await Task.Run(() => context.Places.AsNoTracking().AsEnumerable());
+         return query;
+     }
 }

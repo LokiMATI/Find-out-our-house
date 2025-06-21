@@ -11,6 +11,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<PlaceService>();
 builder.Services.AddTransient<IPlaceRepository, PlaceRepository>();
+builder.Services.AddTransient<IImageRepository, ImageRepository>();
 builder.Services.AddDbContext<EfDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"));

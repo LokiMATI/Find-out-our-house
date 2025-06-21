@@ -34,10 +34,10 @@ public class PlaceRepository(EfDbContext context) : IPlaceRepository
     public async Task<IEnumerable<Place>> GetListWithinRadiusAsync(
         Coordinate center,
         double radius) 
-        => await Task.Run(() => context.Places.AsNoTracking().Include(p => p.Coordinate)
+        => await Task.Run(() => context.Places.AsNoTracking()
                 .Where(p 
-                    => Math.Pow(p.Coordinate.Longitude - center.Longitude, 2) 
-                    * Math.Pow(p.Coordinate.Latitude - center.Latitude, 2) <= Math.Pow(radius, 2)));
+                    => Math.Pow(p.Longitude - center.Longitude, 2) 
+                    * Math.Pow(p.Latitude - center.Latitude, 2) <= Math.Pow(radius, 2)));
 
     /// <inheritdoc/>
     public async Task<Place> CreateAsync(
@@ -48,7 +48,8 @@ public class PlaceRepository(EfDbContext context) : IPlaceRepository
         Place place = new(
             title, 
             description,
-            coordinate);
+            coordinate.Latitude,
+            coordinate.Longitude);
         
         await context.Places.AddAsync(place);
         await context.SaveChangesAsync();
@@ -76,7 +77,10 @@ public class PlaceRepository(EfDbContext context) : IPlaceRepository
         if (images is not null && images.Count > 0)
             place.Images = images;
         if (coordinate is not null)
-            place.Coordinate = coordinate;
+        {
+            place.Latitude = coordinate.Latitude;
+            place.Longitude = coordinate.Longitude;
+        }
         
         await Task.Run(() => context.Places.Update(place));
         await context.SaveChangesAsync();

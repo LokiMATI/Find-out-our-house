@@ -51,23 +51,31 @@ public class Place
     public List<Guid> Images { get; set; }
     
     /// <summary>
-    /// Координаты.
+    /// Широта.
     /// </summary>
-    public Coordinate Coordinate { get; set; }
+    public double Latitude { get; set; }
+    
+    /// <summary>
+    /// Долгота.
+    /// </summary>
+    public double Longitude { get; set; }
 
     /// <summary>
     /// Создание на основе первичных данных.
     /// </summary>
     /// <param name="title">Название.</param>
     /// <param name="description">Описание.</param>
-    /// <param name="coordinate">Координаты.</param>
+    /// <param name="latitude">Широта.</param>
+    /// <param name="longitude">Долгота.</param>
     public Place(
         string title,
         string? description,
-        Coordinate coordinate)
+        double latitude,
+        double longitude)
         : this(
             title,
-            coordinate)
+            latitude,
+            longitude)
     {
         Id = Guid.NewGuid();
         
@@ -75,12 +83,14 @@ public class Place
             Description = description;
     }
 
-    private Place(
+    protected Place(
         string title,
-        Coordinate coordinate)
+        double latitude,
+        double longitude)
     {
         Title = title;
-        Coordinate = coordinate;
+        Latitude = latitude;
+        Longitude = longitude;
         Images = new();
     }
 }

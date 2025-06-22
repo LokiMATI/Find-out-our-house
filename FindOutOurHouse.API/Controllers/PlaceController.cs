@@ -41,11 +41,11 @@ public class PlacesController(PlaceService service) : ControllerBase
     }
     
     [HttpGet("near")]
-    public async Task<IActionResult> GetListAsync(
-        [FromBody] PlaceGetDto input)
+    public async Task<IActionResult> GetListAsync(double latitude, double longitude, double radius)
     {
         try
         {
+            PlaceGetDto input = new(new(latitude, longitude), radius);
             return Ok(await service.GetPlacesAsync(
                 input));
         }

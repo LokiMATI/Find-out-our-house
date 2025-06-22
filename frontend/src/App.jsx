@@ -1,11 +1,12 @@
-import './App.css'
+import { MapGL } from './components/MapGL/MapGL.jsx'
+import React from "react";
 
-function App() {
+const App = () => {
+    return (
+        <div style={{ width: '100%', height: '100%' }}>
+            <MapGL />
+        </div>
+    );
+};
 
-  return (
-    <>
-    </>
-  )
-}
-
-export default App
+export default App;

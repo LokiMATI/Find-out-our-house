@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindOutOurHouse.API", "FindOutOurHouse.API\FindOutOurHouse.API.csproj", "{A32F7CAC-3BA4-48E6-AF94-D334C8FFBCF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindOutOurHouse.Model", "FindOutOurHouse.Model\FindOutOurHouse.Model.csproj", "{36755DAA-D266-4EDE-B371-875EA9C61459}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindOutOurHouse.DAL", "FindOutOurHouse.DAL\FindOutOurHouse.DAL.csproj", "{7AC13322-F750-4E70-AADC-BBAE8C30B147}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{A32F7CAC-3BA4-48E6-AF94-D334C8FFBCF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A32F7CAC-3BA4-48E6-AF94-D334C8FFBCF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A32F7CAC-3BA4-48E6-AF94-D334C8FFBCF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36755DAA-D266-4EDE-B371-875EA9C61459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36755DAA-D266-4EDE-B371-875EA9C61459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36755DAA-D266-4EDE-B371-875EA9C61459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36755DAA-D266-4EDE-B371-875EA9C61459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AC13322-F750-4E70-AADC-BBAE8C30B147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AC13322-F750-4E70-AADC-BBAE8C30B147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AC13322-F750-4E70-AADC-BBAE8C30B147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AC13322-F750-4E70-AADC-BBAE8C30B147}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -2,9 +2,11 @@ import { load } from '@2gis/mapgl';
 import React, {useEffect, useRef, useState} from "react";
 import { fetchNearbyPlaces } from '/src/services/Api.js'
 import { getMarkerPopupHTML } from './MarkerPopup';
+import { useNavigate } from 'react-router-dom';
 
 
 export const MapGL = () => {
+    const navigate = useNavigate();
     const mapRef = useRef(null);
     const mapInstance = useRef(null);
     const [markers, setMarker] = useState(new Map());
@@ -24,7 +26,6 @@ export const MapGL = () => {
                 const center = position
                     ? [position.coords.longitude, position.coords.latitude]
                     : [40.5433, 64.5401]; // Fallback координаты
-
 
 
                 mapInstance.current = new mapglAPI.Map(mapRef.current, {
@@ -56,8 +57,6 @@ export const MapGL = () => {
                                     coordinates,
                                     icon: 'https://docs.2gis.com/img/dotMarker.svg'
                                 });
-
-
 
                                 // Добавляем обработчик клика
                                 marker.on('click', (e) => {
@@ -97,13 +96,14 @@ export const MapGL = () => {
                                     // Обработчик кнопки "Подробнее"
                                     const detailsBtn = popupContainer.querySelector('.details-btn');
                                     if (detailsBtn) {
-                                        detailsBtn.addEventListener('click', (e) => {
-                                            e.stopPropagation();
-                                            // Закрываем попап
+                                        detailsBtn.addEventListener('click', () => {
+
                                             if (currentPopup.current) {
                                                 currentPopup.current.destroy();
                                                 currentPopup.current = null;
                                             }
+                                            console.log(data.id);
+                                            navigate('/place', { state: {id: data.id}})
                                         });
                                     }
                                 });

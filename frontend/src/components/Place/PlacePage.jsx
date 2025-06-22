@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import {useLocation, useNavigate} from 'react-router-dom';
+import { fetchGetPlace } from '/src/services/Api.js';
 
-const PlacePage = () => {
-    const { id } = useParams();
+export const PlacePage = () => {
+    const {state} = useLocation();
+    const { id } = state;
     const navigate = useNavigate();
     const [place, setPlace] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -13,8 +14,9 @@ const PlacePage = () => {
         const fetchPlace = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`http://localhost:5089/api/Places/${id}`);
-                setPlace(response.data);
+
+                const response = await fetchGetPlace(id);
+                setPlace(response);
             } catch (err) {
                 setError(err.message);
                 console.error('Ошибка загрузки данных:', err);

@@ -1,11 +1,16 @@
 import { MapGL } from './components/MapGL/MapGL.jsx'
+import { PlacePage } from './components/Place/PlacePage.jsx'
 import React from "react";
+import {Route, Routes} from "react-router-dom";
 
 const App = () => {
     return (
-        <div style={{ width: '100%', height: '100%' }}>
-            <MapGL />
-        </div>
+        <>
+            <Routes>
+                <Route path="/" element={<MapGL/>} />
+                <Route path="/place" element={<PlacePage/>} />
+            </Routes>
+        </>
     );
 };
 

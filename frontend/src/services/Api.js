@@ -17,3 +17,8 @@ export const fetchGetPlace = async (id) => {
     const response = await axios.get(`${API_BASE}/Places/${id}`);
     return response.data;
 };
+
+export const createPlace = async (place) => {
+    const response = await axios.post(`${API_BASE}/Places`, place);
+    return response;
+}

@@ -1,7 +1,7 @@
 import { load } from '@2gis/mapgl';
 import React, {useEffect, useRef, useState} from "react";
-import { fetchNearbyPlaces } from '/src/services/Api.js'
-import { getMarkerPopupHTML } from './MarkerPopup';
+import {createPlace, fetchNearbyPlaces} from '/src/services/Api.js'
+import {createMarkerPopup, getMarkerPopupHTML} from './MarkerPopup';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -13,13 +13,13 @@ export const MapGL = () => {
     const currentPopup = useRef(null);
 
     const addItemToMap = (key, value) => {
-        setMarker((prevMap) => new Map(prevMap.set(key, value)));
+        setMarker(markers.set(key, value));
     };
 
     useEffect(() => {
         let mounted = true;
 
-        const initMap = (position) => {
+        const initMap = async (position) => {
             load().then((mapglAPI) => {
                 if (!mounted || !mapRef.current) return;
 
@@ -34,11 +34,121 @@ export const MapGL = () => {
                     key: 'a1e81da5-7c22-4dc9-81ad-c1194c9e16a6',
                 });
 
+                const clickHandler = (e) => {
+                    const coord = [e.lngLat[0], e.lngLat[1]];
+
+                    if (currentPopup.current) {
+                        currentPopup.current.destroy();
+                    }
+                    const popupContainer = document.createElement('div');
+                    popupContainer.innerHTML = createMarkerPopup();
+
+                    const titleInput = popupContainer.querySelector('#marker-title');
+                    const createBtn = popupContainer.querySelector('#create-marker-btn');
+
+                    currentPopup.current = new mapglAPI.HtmlMarker(mapInstance.current, {
+                        coordinates: coord,
+                        html: popupContainer,
+                        offset: [0, -40]
+                    });
+
+                    const closeBtn = popupContainer.querySelector('.popup-close-btn');
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', () => {
+                            if (currentPopup.current) {
+                                currentPopup.current.destroy();
+                                currentPopup.current = null;
+                            }
+                        });
+                    }
+
+                    createBtn.addEventListener('click', async () => {
+                        if (!titleInput.value.trim()) {
+                            alert('Введите название метки');
+                            return;
+                        }
+
+                        const newPlace = {
+                            title: titleInput.value,
+                            description: popupContainer.querySelector('#marker-description').value.length === 0
+                                ? null : popupContainer.querySelector('#marker-description').value,
+                            coordinate: {
+                                latitude: coord[1],
+                                longitude: coord[0]
+                            }
+                        };
+
+                        const data = await createPlace(newPlace);
+                        if (data) {
+                            // Создаем маркер
+                            const marker = new mapglAPI.Marker(mapInstance.current, {
+                                coordinates: coord,
+                                icon: 'https://docs.2gis.com/img/dotMarker.svg'
+                            });
+
+                            console.log("Yes")
+
+                            marker.on('click', (e) => {
+                                // Закрываем предыдущий попап
+                                if (currentPopup.current) {
+                                    currentPopup.current.destroy();
+                                }
+
+                                const data = markers.get(e.targetData);
+                                console.log(data);
+
+                                const popupContainer = document.createElement('div');
+                                popupContainer.innerHTML = getMarkerPopupHTML({
+                                    title: data.title,
+                                    description: data.description,
+                                    image: data.images?.[0]
+                                });
+
+                                currentPopup.current = new mapglAPI.HtmlMarker(mapInstance.current, {
+                                    coordinates: coord,
+                                    html: popupContainer,
+                                    offset: [0, -40]
+                                });
+
+                                // Обработчик закрытия попапа
+                                const closeBtn = popupContainer.querySelector('.popup-close-btn');
+                                if (closeBtn) {
+                                    closeBtn.addEventListener('click', () => {
+                                        if (currentPopup.current) {
+                                            currentPopup.current.destroy();
+                                            currentPopup.current = null;
+                                        }
+                                    });
+                                }
+
+                                // Обработчик кнопки "Подробнее"
+                                const detailsBtn = popupContainer.querySelector('.details-btn');
+                                if (detailsBtn) {
+                                    detailsBtn.addEventListener('click', () => {
+
+                                        if (currentPopup.current) {
+                                            currentPopup.current.destroy();
+                                            currentPopup.current = null;
+                                        }
+                                        console.log(data.id);
+                                        navigate('/place', {state: {id: data.id}})
+                                    });
+                                }
+                            });
+                            addItemToMap(marker, data);
+                            currentPopup.current.destroy();
+                            currentPopup.current = null;
+                        }
+                    });
+                };
+
+                mapInstance.current.on('click', clickHandler);
+
                 // Добавляем маркер текущего местоположения
                 if (position) {
                     new mapglAPI.Marker(mapInstance.current, {
                         coordinates: center,
-                        icon: 'https://docs.2gis.com/img/mapgl/marker.svg'
+                        icon: 'https://docs.2gis.com/img/mapgl/dotMarker.svg'
                     });
 
                 const loadAndDisplayMarkers = async () => {
@@ -48,10 +158,10 @@ export const MapGL = () => {
                             position.coords.longitude
                         );
 
+
                         if (Array.isArray(places)) {
                             places.forEach((data) => {
                                 const coordinates = [data.coordinate.longitude, data.coordinate.latitude];
-
                                 // Создаем маркер
                                 const marker = new mapglAPI.Marker(mapInstance.current, {
                                     coordinates,
@@ -66,18 +176,17 @@ export const MapGL = () => {
                                     }
 
                                     const data = markers.get(e.targetData);
-                                    console.log(data);
+                                    console.log(data.title);
 
                                     const popupContainer = document.createElement('div');
                                     popupContainer.innerHTML = getMarkerPopupHTML({
-                                        id: data.id, // Добавляем ID места
                                         title: data.title,
                                         description: data.description,
                                         image: data.images?.[0]
                                     });
 
                                     currentPopup.current = new mapglAPI.HtmlMarker(mapInstance.current, {
-                                        coordinates: [data.coordinate.longitude, data.coordinate.latitude],
+                                        coordinates: coordinates,
                                         html: popupContainer,
                                         offset: [0, -40]
                                     });

@@ -1,9 +1,18 @@
 import { load } from '@2gis/mapgl';
-import React, { useEffect, useRef } from "react";
+import React, {useEffect, useRef, useState} from "react";
+import { fetchNearbyPlaces } from '/src/services/Api.js'
+import { getMarkerPopupHTML } from './MarkerPopup';
+
 
 export const MapGL = () => {
     const mapRef = useRef(null);
     const mapInstance = useRef(null);
+    const [markers, setMarker] = useState(new Map());
+    const currentPopup = useRef(null);
+
+    const addItemToMap = (key, value) => {
+        setMarker((prevMap) => new Map(prevMap.set(key, value)));
+    };
 
     useEffect(() => {
         let mounted = true;
@@ -16,6 +25,8 @@ export const MapGL = () => {
                     ? [position.coords.longitude, position.coords.latitude]
                     : [40.5433, 64.5401]; // Fallback координаты
 
+
+
                 mapInstance.current = new mapglAPI.Map(mapRef.current, {
                     center,
                     zoom: 15,
@@ -26,9 +37,86 @@ export const MapGL = () => {
                 if (position) {
                     new mapglAPI.Marker(mapInstance.current, {
                         coordinates: center,
-                        icon: 'https://docs.2gis.com/img/dotMarker.svg',
-                        label: 'Вы здесь'
+                        icon: 'https://docs.2gis.com/img/mapgl/marker.svg'
                     });
+
+                const loadAndDisplayMarkers = async () => {
+                    try {
+                        const places = await fetchNearbyPlaces(
+                            position.coords.latitude,
+                            position.coords.longitude
+                        );
+
+                        if (Array.isArray(places)) {
+                            places.forEach((data) => {
+                                const coordinates = [data.coordinate.longitude, data.coordinate.latitude];
+
+                                // Создаем маркер
+                                const marker = new mapglAPI.Marker(mapInstance.current, {
+                                    coordinates,
+                                    icon: 'https://docs.2gis.com/img/dotMarker.svg'
+                                });
+
+
+
+                                // Добавляем обработчик клика
+                                marker.on('click', (e) => {
+                                    // Закрываем предыдущий попап
+                                    if (currentPopup.current) {
+                                        currentPopup.current.destroy();
+                                    }
+
+                                    const data = markers.get(e.targetData);
+                                    console.log(data);
+
+                                    const popupContainer = document.createElement('div');
+                                    popupContainer.innerHTML = getMarkerPopupHTML({
+                                        id: data.id, // Добавляем ID места
+                                        title: data.title,
+                                        description: data.description,
+                                        image: data.images?.[0]
+                                    });
+
+                                    currentPopup.current = new mapglAPI.HtmlMarker(mapInstance.current, {
+                                        coordinates: [data.coordinate.longitude, data.coordinate.latitude],
+                                        html: popupContainer,
+                                        offset: [0, -40]
+                                    });
+
+                                    // Обработчик закрытия попапа
+                                    const closeBtn = popupContainer.querySelector('.popup-close-btn');
+                                    if (closeBtn) {
+                                        closeBtn.addEventListener('click', () => {
+                                            if (currentPopup.current) {
+                                                currentPopup.current.destroy();
+                                                currentPopup.current = null;
+                                            }
+                                        });
+                                    }
+
+                                    // Обработчик кнопки "Подробнее"
+                                    const detailsBtn = popupContainer.querySelector('.details-btn');
+                                    if (detailsBtn) {
+                                        detailsBtn.addEventListener('click', (e) => {
+                                            e.stopPropagation();
+                                            // Закрываем попап
+                                            if (currentPopup.current) {
+                                                currentPopup.current.destroy();
+                                                currentPopup.current = null;
+                                            }
+                                        });
+                                    }
+                                });
+
+                                addItemToMap(marker, data);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при загрузке маркеров:', error);
+                    }
+                };
+
+                loadAndDisplayMarkers();
                 }
 
             }).catch(error => {

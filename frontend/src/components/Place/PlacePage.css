@@ -1,0 +1,83 @@
+.place-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.back-button {
+    background: #3b7eff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.back-button:hover {
+    background: #2a65d1;
+}
+
+.place-header {
+    margin-bottom: 30px;
+}
+
+.place-header h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.coordinates {
+    color: #666;
+    font-size: 14px;
+}
+
+.place-description {
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.place-description h2 {
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.place-gallery h2 {
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.image-wrapper {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.image-wrapper:hover img {
+    transform: scale(1.03);
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+}
+
+.error {
+    color: #d32f2f;
+}
